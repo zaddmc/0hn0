@@ -4,8 +4,8 @@ namespace _0hn0;
 public class TileInfo {
     public enum TileState {
         Empty,
-        Blue,
         Red,
+        Blue,
     }
     public TileState State { get; set; }
     public IWebElement WebElement { get; set; }
