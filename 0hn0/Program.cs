@@ -1,5 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using System.Collections.Generic;
+using System.Threading;
 
 
 namespace _0hn0;
@@ -33,17 +35,24 @@ internal class Program {
 
     }
     static void ReadWebTiles(IWebDriver webDriver) {
+        TileInfo.notFulfilled = new List<TileInfo>(); //initialzing or clearing the static internal list
+
         IWebElement board = webDriver.FindElement(By.Id("board"));
 
         tiles = new TileInfo[gridSize][];
         for (int i = 0; i < gridSize; i++) {
             tiles[i] = new TileInfo[gridSize];
             for (int j = 0; j < gridSize; j++) {
-                tiles[i][j] = new TileInfo(board.FindElement(By.Id($"tile-{i}-{j}")));
+                tiles[i][j] = new TileInfo(board.FindElement(By.Id($"tile-{i}-{j}")), new Posistion(i, j));
             }
         }
     }
     static bool IsDone() {
-        return false;
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                if (tiles[i][j].State == TileState.Empty) return false;
+            }
+        }
+        return true;
     }
 }
