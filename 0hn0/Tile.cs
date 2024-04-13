@@ -10,10 +10,17 @@ public class TileInfo {
         Blue,
     }
     public TileState State { get; set; }
+    public enum Directions {
+        Up,
+        Right,
+        Down,
+        Left,
+    }
+    public List<Directions> OpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
     public IWebElement WebElement { get; set; }
     public Posistion? Posistion { get; set; }
     public bool IsLocked { get; set; }
-    public bool IsFulfilled { get; set; }
+    public bool IsFulfilled { get; set; } = false;
     public int DesiredNumber { get; set; }
 
     public TileInfo(IWebElement element, Posistion posistion) {
@@ -37,6 +44,10 @@ public class TileInfo {
             default:
                 break;
         }
+        if (Posistion.I < 0) OpenDirections.Remove(Directions.Left);
+        if (Posistion.I > Program.gridSize) OpenDirections.Remove(Directions.Right);
+        if (Posistion.J < 0) OpenDirections.Remove(Directions.Up);
+        if (Posistion.J > Program.gridSize) OpenDirections.Remove(Directions.Down);
     }
 }
 public class Posistion(int i, int j) { // this is a an obejecct to resemble a posistion in a larger system
