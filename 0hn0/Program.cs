@@ -50,7 +50,7 @@ internal class Program {
     static bool IsDone() {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                if (tiles[i][j].State == TileState.Empty) return false;
+                if (tiles[i][j].State == TileInfo.TileState.Empty) return false;
             }
         }
         return true;
