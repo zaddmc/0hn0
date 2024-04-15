@@ -22,6 +22,7 @@ public class TileInfo {
     public bool IsLocked { get; set; }
     public bool IsFulfilled { get; set; } = false;
     public int DesiredNumber { get; set; }
+    public int CurrentCount { get; set; }
 
     public TileInfo(IWebElement element, Posistion posistion) {
         WebElement = element;
