@@ -35,7 +35,8 @@ public class TileInfo {
             case "tile tile-1":
                 State = TileState.Blue;
                 IsLocked = true;
-                DesiredNumber = int.Parse(element.Text);
+                int.TryParse(element.Text, out int temp);
+                DesiredNumber = temp;
                 notFulfilled.Add(this);
                 break;
             case "tile tile-2":
