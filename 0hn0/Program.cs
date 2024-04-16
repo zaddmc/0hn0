@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using System.Collections.Generic;
 using System.Threading;
+using static _0hn0.TileInfo;
 
 
 namespace _0hn0;
@@ -34,6 +35,42 @@ internal class Program {
     static void Algorithm() {// this is the algorithm htat solves the game
 
     }
+
+    static void updateDirections(TileInfo[][] tiles) {
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                foreach (Directions direction in tiles[i][j].OpenDirections) {
+                    switch (direction) {
+                        case Directions.Up:
+                            break;
+                        case Directions.Right:
+                            break;
+                        case Directions.Down:
+                            break;
+                        case Directions.Left:
+                            break;
+                        default:
+                            break;
+
+                    }
+                }
+            }
+        }
+    }
+    static bool DeadEndController(TileInfo[][] tiles) {
+        bool returnState = false;
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                if (tiles[i][j].OpenDirections.Count == 0) {
+                    tiles[i][j].State = TileState.Red;
+                    returnState = true;
+                }
+            }
+        }
+        return returnState;
+    }
+
+
     static bool CloseFinishedEndsController() {
 
 
@@ -81,6 +118,7 @@ internal class Program {
         }
     }
     static TileInfo[][] ReadWebTiles(IWebDriver webDriver) {
+
         TileInfo.notFulfilled = new List<TileInfo>(); //initialzing or clearing the static internal list
 
 
