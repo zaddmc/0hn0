@@ -18,7 +18,7 @@ public class TileInfo {
     }
     public List<Directions> OpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
     public IWebElement WebElement { get; set; }
-    public Posistion? Posistion { get; set; }
+    public Posistion Posistion { get; set; }
     public bool IsLocked { get; set; }
     public bool IsFulfilled { get; set; } = false;
     public int DesiredNumber { get; set; }
@@ -55,5 +55,15 @@ public class TileInfo {
 public class Posistion(int i, int j) { // this is a an obejecct to resemble a posistion in a larger system
     public int I { get; set; } = i; // this is a variable in an possible object
     public int J { get; set; } = j; // this is a variable in an possible object
+    public static Posistion operator +(Posistion main, Posistion other) {
+        return new Posistion(main.I + other.I, main.J + other.J);
+    }
+    public bool IsInBounds() {
+        if (I < 0) return false;
+        if (I > Program.gridSize - 1) return false;
+        if (J < 0) return false;
+        if (J > Program.gridSize - 1) return false;
+        return true;
+    } 
 }
 
