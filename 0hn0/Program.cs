@@ -24,7 +24,7 @@ internal class Program {
 
             TileInfo[][] tiles = ReadWebTiles(webDriver);
             TileInfo[][] tilesRot = RotateMatrix(tiles);
-            
+
             Algorithm(); // this will solve the game
 
 
@@ -40,15 +40,49 @@ internal class Program {
 
         return false;
     }
-    static bool CloseFinishedEnds(TileInfo[] tiles) {
+    static bool CloseFinishedEnds() {
+        foreach (var tile in TileInfo.notFulfilled) {
+            foreach (var direction in tile.OpenDirections) {
+
+            }
+
+
+
+
+
+        }
 
 
 
         return false;
     }
+    static int DoCount(TileInfo tile) {
+        int totalCount = 0;
+        foreach (var direction in tile.OpenDirections) {
+            totalCount += CountDirection(tile, direction);
+        }
+        return totalCount;
+    }
+    static int CountDirection(TileInfo tile, TileInfo.Directions direction) {
+        Posistion growth; // functions like a vector in given direction
+        switch (direction) {
+            case TileInfo.Directions.Up: growth = new(-1, 0); break;
+            case TileInfo.Directions.Right: growth = new(0, 1); break;
+            case TileInfo.Directions.Down: growth = new(1, 0); break;
+            case TileInfo.Directions.Left: growth = new(0, -1); break;
+            default: growth = new(0, 0); break;
+        }
+        int count = 0;
+        Posistion target = tile.Posistion;
+        while (true) {
+            target += growth;
+            if (!target.IsInBounds()) return count;
+            count++;
+        }
+    }
     static TileInfo[][] ReadWebTiles(IWebDriver webDriver) {
         TileInfo.notFulfilled = new List<TileInfo>(); //initialzing or clearing the static internal list
-         
+
 
         IWebElement board = webDriver.FindElement(By.Id("board"));
 
