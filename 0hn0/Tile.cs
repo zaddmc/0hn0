@@ -33,23 +33,23 @@ public class TileInfo {
                 IsLocked = false;
                 break;
             case "tile tile-1":
+                State = TileState.Red;
+                IsLocked = true;
+                break;
+            case "tile tile-2":
                 State = TileState.Blue;
                 IsLocked = true;
                 int.TryParse(element.Text, out int temp);
                 DesiredNumber = temp;
                 notFulfilled.Add(this);
                 break;
-            case "tile tile-2":
-                State = TileState.Red;
-                IsLocked = true;
-                break;
             default:
                 break;
         }
-        if (Posistion.I < 0) OpenDirections.Remove(Directions.Left);
-        if (Posistion.I > Program.gridSize) OpenDirections.Remove(Directions.Right);
-        if (Posistion.J < 0) OpenDirections.Remove(Directions.Up);
-        if (Posistion.J > Program.gridSize) OpenDirections.Remove(Directions.Down);
+        if (Posistion.I == 0) OpenDirections.Remove(Directions.Left);
+        if (Posistion.I == Program.gridSize - 1) OpenDirections.Remove(Directions.Right);
+        if (Posistion.J == 0) OpenDirections.Remove(Directions.Up);
+        if (Posistion.J == Program.gridSize - 1) OpenDirections.Remove(Directions.Down);
     }
 }
 public class Posistion(int i, int j) { // this is a an obejecct to resemble a posistion in a larger system
