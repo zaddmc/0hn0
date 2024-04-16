@@ -8,7 +8,6 @@ namespace _0hn0;
 
 internal class Program {
     public static int gridSize = 4;
-    public static TileInfo[][] tiles;
 
     static void Main(string[] args) {
 
@@ -23,8 +22,9 @@ internal class Program {
             webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
             Thread.Sleep(1000);
 
-            ReadWebTiles(webDriver);
-
+            TileInfo[][] tiles = ReadWebTiles(webDriver);
+            TileInfo[][] tilesRot = RotateMatrix(tiles);
+            
             Algorithm(); // this will solve the game
 
 
@@ -34,20 +34,49 @@ internal class Program {
     static void Algorithm() {// this is the algorithm htat solves the game
 
     }
-    static void ReadWebTiles(IWebDriver webDriver) {
+    static bool CloseFinishedEndsController() {
+
+
+
+        return false;
+    }
+    static bool CloseFinishedEnds(TileInfo[] tiles) {
+
+
+
+        return false;
+    }
+    static TileInfo[][] ReadWebTiles(IWebDriver webDriver) {
         TileInfo.notFulfilled = new List<TileInfo>(); //initialzing or clearing the static internal list
+         
 
         IWebElement board = webDriver.FindElement(By.Id("board"));
 
-        tiles = new TileInfo[gridSize][];
+        TileInfo[][] tiles = new TileInfo[gridSize][];
         for (int i = 0; i < gridSize; i++) {
             tiles[i] = new TileInfo[gridSize];
             for (int j = 0; j < gridSize; j++) {
                 tiles[i][j] = new TileInfo(board.FindElement(By.Id($"tile-{i}-{j}")), new Posistion(i, j));
             }
         }
+        return tiles;
     }
-    static bool IsDone() {
+    static TileInfo[][] RotateMatrix(TileInfo[][] tiles) {
+        TileInfo[][] tilesRot = new TileInfo[gridSize][];
+        for (int i = 0; i < gridSize; i++) {
+            tilesRot[i] = new TileInfo[gridSize];
+        }
+
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                tilesRot[j][i] = tiles[i][j];
+            }
+        }
+
+
+        return tilesRot;
+    }
+    static bool IsDone(TileInfo[][] tiles) {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 if (tiles[i][j].State == TileInfo.TileState.Empty) return false;
