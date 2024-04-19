@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using static _0hn0.TileInfo;
@@ -23,6 +24,9 @@ internal class Program {
             webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
             Thread.Sleep(1000);
 
+            Console.WriteLine("do interraction");
+            Console.ReadLine();
+
             TileInfo[][] tiles = ReadWebTiles(webDriver);
             TileInfo[][] tilesRot = RotateMatrix(tiles);
 
@@ -34,8 +38,9 @@ internal class Program {
         }
     }
     static void Algorithm() {// this is the algorithm htat solves the game
-        MarkBlueTiles(notFulfilled[1], Directions.Down, 2);
-        MarkBlueTiles(notFulfilled[1], Directions.Left, 2);
+        foreach (var tile in notFulfilled) {
+            Fulfill(tile);
+        }
     }
     static void PrintResult(TileInfo[][] tiles, WebDriver webDriver) {
         for (int i = 0; i < gridSize; i++) {
@@ -94,7 +99,7 @@ internal class Program {
                 break;
             case TileState.Blue:
                 //return true;
-                tiles
+                //tiles
                 break;
             default:
                 break;
@@ -135,10 +140,14 @@ internal class Program {
     }
     static bool Fulfill(TileInfo tile) {
         int totalCount = DoCount(tile);
+        if (totalCount != tile.DesiredNumber) return false;
+        foreach (Directions direction in tile.OpenDirections) {
+            MarkBlueTiles(tile, direction, CountDirection(tile, direction));
+        }
 
-
-
-        return false;
+        TileInfo.notFulfilled.Remove(tile);
+        tile.IsFulfilled = true;
+        return true;
     }
     static bool CloseFinishedEnd(TileInfo tile) {
 
