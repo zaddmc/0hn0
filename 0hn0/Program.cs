@@ -35,18 +35,22 @@ internal class Program {
     static void Algorithm() {// this is the algorithm htat solves the game
 
     }
-    static void updateDirections(TileInfo[][] tiles) {
+    static void updateDirectionsController(TileInfo[][] tiles) {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 foreach (Directions direction in tiles[i][j].OpenDirections) {
                     switch (direction) {
                         case Directions.Up:
+                            updateDirections(tiles[i][j++],tiles[i][j++].State, Directions.Up);
                             break;
                         case Directions.Right:
+                            updateDirections(tiles[i++][j], tiles[i++][j].State, Directions.Right);
                             break;
                         case Directions.Down:
+                            updateDirections(tiles[i][j--], tiles[i][j--].State, Directions.Down);
                             break;
                         case Directions.Left:
+                            updateDirections(tiles[i--][j], tiles[i--][j].State, Directions.Left);
                             break;
                         default:
                             break;
@@ -55,6 +59,23 @@ internal class Program {
                 }
             }
         }
+    }
+    static bool updateDirections(TileInfo tile, TileState color, Directions direction) {
+        
+        switch (tile.State) {
+            case TileState.Empty:
+                return false;
+                break;
+            case TileState.Red:
+                return true;
+                break;
+            case TileState.Blue:
+                //return true;
+                tiles
+                break;
+            default:
+                break;
+        } return false;
     }
     static bool DeadEndController(TileInfo[][] tiles) {
         bool returnState = false;
