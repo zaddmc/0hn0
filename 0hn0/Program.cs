@@ -69,7 +69,7 @@ internal class Program {
                 foreach (Directions direction in tiles[i][j].OpenDirections) {
                     switch (direction) {
                         case Directions.Up:
-                            updateDirections(tiles[i][j++],tiles[i][j++].State, Directions.Up);
+                            updateDirections(tiles[i][j++], tiles[i][j++].State, Directions.Up);
                             break;
                         case Directions.Right:
                             updateDirections(tiles[i++][j], tiles[i++][j].State, Directions.Right);
@@ -89,7 +89,7 @@ internal class Program {
         }
     }
     static bool updateDirections(TileInfo tile, TileState color, Directions direction) {
-        
+
         switch (tile.State) {
             case TileState.Empty:
                 return false;
@@ -103,7 +103,8 @@ internal class Program {
                 break;
             default:
                 break;
-        } return false;
+        }
+        return false;
     }
     static bool DeadEndController(TileInfo[][] tiles) {
         bool returnState = false;
@@ -150,6 +151,8 @@ internal class Program {
         return true;
     }
     static bool CloseFinishedEnd(TileInfo tile) {
+        if (DoCount(tile) != tile.DesiredNumber) return false;
+
 
         foreach (var direction in tile.OpenDirections) {
 
