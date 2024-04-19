@@ -58,22 +58,23 @@ internal class Program {
             }
         }
     }
-    static void updateDirectionsController(TileInfo[][] tiles) {
+    static void UpdateDirectionsController(TileInfo[][] tiles) {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 foreach (Directions direction in tiles[i][j].OpenDirections) {
+                    UpdateDirections(new Posistion(i, j), tiles, direction);
                     switch (direction) {
                         case Directions.Up:
-                            updateDirections(tiles[i][j++],tiles[i][j++].State, Directions.Up);
+                            UpdateDirections(new Posistion(i, j), tiles, Directions.Up);
                             break;
                         case Directions.Right:
-                            updateDirections(tiles[i++][j], tiles[i++][j].State, Directions.Right);
+                            UpdateDirections(new Posistion(i, j), tiles, Directions.Right);
                             break;
                         case Directions.Down:
-                            updateDirections(tiles[i][j--], tiles[i][j--].State, Directions.Down);
+                            UpdateDirections(new Posistion(i, j), tiles, Directions.Down);
                             break;
                         case Directions.Left:
-                            updateDirections(tiles[i--][j], tiles[i--][j].State, Directions.Left);
+                            UpdateDirections(new Posistion(i, j), tiles, Directions.Left);
                             break;
                         default:
                             break;
@@ -83,9 +84,10 @@ internal class Program {
             }
         }
     }
-    static bool updateDirections(TileInfo tile, TileState color, Directions direction) {
-        
-        switch (tile.State) {
+    static bool UpdateDirections(Posistion position, TileInfo[][] tiles, Directions direction) {
+
+        position += Posistion.GrowthVector(direction);
+        switch (tiles[position.I][position.J].State) {
             case TileState.Empty:
                 return false;
                 break;
@@ -94,11 +96,13 @@ internal class Program {
                 break;
             case TileState.Blue:
                 //return true;
-                tiles
+                //tiles
+                return UpdateDirections(new Posistion(11, 2), tiles, direction);
                 break;
             default:
                 break;
-        } return false;
+        }
+        return false;
     }
     static bool DeadEndController(TileInfo[][] tiles) {
         bool returnState = false;
