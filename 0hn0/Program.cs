@@ -30,17 +30,19 @@ internal class Program {
             TileInfo[][] tiles = ReadWebTiles(webDriver);
             TileInfo[][] tilesRot = RotateMatrix(tiles);
 
-            Algorithm(); // this will solve the game
+            Algorithm(tiles); // this will solve the game
 
             PrintResult(tiles, webDriver);
 
             isRunning = false; // to only get it run once, could have been done with a do-while loop, but idc
         }
     }
-    static void Algorithm() {// this is the algorithm htat solves the game
+    static void Algorithm(TileInfo[][] tiles) {// this is the algorithm htat solves the game
         foreach (var tile in notFulfilled) {
-            Fulfill(tile);
+            //Fulfill(tile);
+
         }
+        DeadEndController(tiles);
     }
     static void PrintResult(TileInfo[][] tiles, WebDriver webDriver) {
         for (int i = 0; i < gridSize; i++) {
@@ -67,32 +69,16 @@ internal class Program {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 foreach (Directions direction in tiles[i][j].OpenDirections) {
-                    UpdateDirections(new Position(i, j), tiles, direction);
-                    switch (direction) {
-                        case Directions.Up:
-                            UpdateDirections(new Position(i, j), tiles, Directions.Up);
-                            break;
-                        case Directions.Right:
-                            UpdateDirections(new Position(i, j), tiles, Directions.Right);
-                            break;
-                        case Directions.Down:
-                            UpdateDirections(new Position(i, j), tiles, Directions.Down);
-                            break;
-                        case Directions.Left:
-                            UpdateDirections(new Position(i, j), tiles, Directions.Left);
-                            break;
-                        default:
-                            break;
-
-                    }
+                    UpdateDirections(new Position(i, j), direction);
+                    
                 }
             }
         }
     }
-    static bool UpdateDirections(Position position, TileInfo[][] tiles, Directions direction) {
+    static bool UpdateDirections(Position position, Directions direction) {
 
         position += Position.GrowthVector(direction);
-        switch (tiles[position.I][position.J].State) {
+        switch (TileDict[position.ToString()].State) {
             case TileState.Empty:
                 return false;
                 break;
@@ -102,7 +88,7 @@ internal class Program {
             case TileState.Blue:
                 //return true;
                 //tiles
-                return UpdateDirections(new Position(11, 2), tiles, direction);
+                return UpdateDirections(position, direction);
                 break;
             default:
                 break;
