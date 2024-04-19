@@ -28,14 +28,36 @@ internal class Program {
 
             Algorithm(); // this will solve the game
 
+            PrintResult(tiles, webDriver);
 
             isRunning = false; // to only get it run once, could have been done with a do-while loop, but idc
         }
     }
     static void Algorithm() {// this is the algorithm htat solves the game
-
+        MarkBlueTiles(notFulfilled[1], Directions.Down, 2);
+        MarkBlueTiles(notFulfilled[1], Directions.Left, 2);
     }
-
+    static void PrintResult(TileInfo[][] tiles, WebDriver webDriver) {
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                TileInfo theTile = tiles[i][j];
+                if (theTile.IsLocked) continue;
+                switch (theTile.State) {
+                    case TileState.Empty:
+                        break;
+                    case TileState.Blue:
+                        theTile.WebElement.Click();
+                        break;
+                    case TileState.Red:
+                        theTile.WebElement.Click();
+                        theTile.WebElement.Click();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
     static void updateDirections(TileInfo[][] tiles) {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
@@ -70,24 +92,39 @@ internal class Program {
         return returnState;
     }
 
+    static bool MarkBlueTiles(TileInfo tile, Directions direction, int count) {
+        Posistion growth = Posistion.GrowthVector(direction);
+        Posistion target = tile.Posistion;
+        for (int i = 0; i < count; i++) {
+            target += growth;
+            if (!target.IsInBounds()) return false;
 
-    static bool CloseFinishedEndsController() {
+            TileInfo targetTile = target.ToTile();
+            if (targetTile.State == TileState.Red) return false;
+
+            if (targetTile.State == TileState.Blue) continue;
+
+            targetTile.State = TileState.Blue;
+            targetTile.CurrentCount++;
+        }
+
+
+
+        return true;
+    }
+    static bool Fulfill(TileInfo tile) {
+        int totalCount = DoCount(tile);
 
 
 
         return false;
     }
-    static bool CloseFinishedEnds() {
-        foreach (var tile in TileInfo.notFulfilled) {
-            foreach (var direction in tile.OpenDirections) {
+    static bool CloseFinishedEnd(TileInfo tile) {
 
-            }
-
-
-
-
+        foreach (var direction in tile.OpenDirections) {
 
         }
+
 
 
 
@@ -101,26 +138,20 @@ internal class Program {
         return totalCount;
     }
     static int CountDirection(TileInfo tile, TileInfo.Directions direction) {
-        Posistion growth; // functions like a vector in given direction
-        switch (direction) {
-            case TileInfo.Directions.Up: growth = new(-1, 0); break;
-            case TileInfo.Directions.Right: growth = new(0, 1); break;
-            case TileInfo.Directions.Down: growth = new(1, 0); break;
-            case TileInfo.Directions.Left: growth = new(0, -1); break;
-            default: growth = new(0, 0); break;
-        }
+        Posistion growth = Posistion.GrowthVector(direction); // functions like a vector in given direction
         int count = 0;
         Posistion target = tile.Posistion;
         while (true) {
             target += growth;
             if (!target.IsInBounds()) return count;
+            if (target.ToTile().State == TileState.Red) return count;
             count++;
         }
     }
     static TileInfo[][] ReadWebTiles(IWebDriver webDriver) {
 
         TileInfo.notFulfilled = new List<TileInfo>(); //initialzing or clearing the static internal list
-
+        TileInfo.TileDict = new Dictionary<string, TileInfo>();
 
         IWebElement board = webDriver.FindElement(By.Id("board"));
 
