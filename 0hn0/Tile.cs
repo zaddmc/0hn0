@@ -1,9 +1,11 @@
 ﻿using OpenQA.Selenium;
 using System.Collections.Generic;
+using static _0hn0.TileInfo;
 
 namespace _0hn0;
 public class TileInfo {
     public static List<TileInfo> notFulfilled { get; set; }
+    public static Dictionary<string, TileInfo> TileDict { get; set; }
     public enum TileState {
         Empty,
         Red,
@@ -17,11 +19,11 @@ public class TileInfo {
         Left,
     }
     public List<Directions> OpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
-    public IWebElement WebElement { get; set; }
-    public Posistion Posistion { get; set; }
-    public bool IsLocked { get; set; }
+    public IWebElement WebElement { get; private set; }
+    public Posistion Posistion { get; private set; }
+    public bool IsLocked { get; private set; }
     public bool IsFulfilled { get; set; } = false;
-    public int DesiredNumber { get; set; }
+    public int DesiredNumber { get; private set; }
     public int CurrentCount { get; set; }
 
     public TileInfo(IWebElement element, Posistion posistion) {
@@ -50,6 +52,8 @@ public class TileInfo {
         if (Posistion.I == Program.gridSize - 1) OpenDirections.Remove(Directions.Right);
         if (Posistion.J == 0) OpenDirections.Remove(Directions.Up);
         if (Posistion.J == Program.gridSize - 1) OpenDirections.Remove(Directions.Down);
+
+        TileDict.Add(posistion.ToString(), this);
     }
 }
 public class Posistion(int i, int j) { // this is a an obejecct to resemble a posistion in a larger system
@@ -65,5 +69,20 @@ public class Posistion(int i, int j) { // this is a an obejecct to resemble a po
         if (J > Program.gridSize - 1) return false;
         return true;
     } 
+    public override string ToString() {
+        return $"{I}:{J}";
+    }
+    public TileInfo ToTile() {
+        return TileInfo.TileDict[this.ToString()];
+    }
+    static public Posistion GrowthVector(TileInfo.Directions direction) {
+        switch (direction) {
+            case Directions.Up: return new(0, -1); 
+            case Directions.Right: return new(1, 0); 
+            case Directions.Down: return new(0, 1); 
+            case Directions.Left: return new(-1, 0); 
+            default: return new(0, 0); 
+        }
+    }
 }
 
