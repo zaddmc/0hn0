@@ -20,13 +20,13 @@ public class TileInfo {
     }
     public List<Directions> OpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
     public IWebElement WebElement { get; private set; }
-    public Posistion Posistion { get; private set; }
+    public Position Posistion { get; private set; }
     public bool IsLocked { get; private set; }
     public bool IsFulfilled { get; set; } = false;
     public int DesiredNumber { get; private set; }
     public int CurrentCount { get; set; }
 
-    public TileInfo(IWebElement element, Posistion posistion) {
+    public TileInfo(IWebElement element, Position posistion) {
         WebElement = element;
         Posistion = posistion;
         switch (element.GetAttribute("class")) {
@@ -56,11 +56,11 @@ public class TileInfo {
         TileDict.Add(posistion.ToString(), this);
     }
 }
-public class Posistion(int i, int j) { // this is a an obejecct to resemble a posistion in a larger system
+public class Position(int i, int j) { // this is a an obejecct to resemble a posistion in a larger system
     public int I { get; set; } = i; // this is a variable in an possible object
     public int J { get; set; } = j; // this is a variable in an possible object
-    public static Posistion operator +(Posistion main, Posistion other) {
-        return new Posistion(main.I + other.I, main.J + other.J);
+    public static Position operator +(Position main, Position other) {
+        return new Position(main.I + other.I, main.J + other.J);
     }
     public bool IsInBounds() {
         if (I < 0) return false;
@@ -75,7 +75,7 @@ public class Posistion(int i, int j) { // this is a an obejecct to resemble a po
     public TileInfo ToTile() {
         return TileInfo.TileDict[this.ToString()];
     }
-    static public Posistion GrowthVector(TileInfo.Directions direction) {
+    static public Position GrowthVector(TileInfo.Directions direction) {
         switch (direction) {
             case Directions.Up: return new(0, -1); 
             case Directions.Right: return new(1, 0); 

@@ -67,19 +67,19 @@ internal class Program {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 foreach (Directions direction in tiles[i][j].OpenDirections) {
-                    UpdateDirections(new Posistion(i, j), tiles, direction);
+                    UpdateDirections(new Position(i, j), tiles, direction);
                     switch (direction) {
                         case Directions.Up:
-                            UpdateDirections(new Posistion(i, j), tiles, Directions.Up);
+                            UpdateDirections(new Position(i, j), tiles, Directions.Up);
                             break;
                         case Directions.Right:
-                            UpdateDirections(new Posistion(i, j), tiles, Directions.Right);
+                            UpdateDirections(new Position(i, j), tiles, Directions.Right);
                             break;
                         case Directions.Down:
-                            UpdateDirections(new Posistion(i, j), tiles, Directions.Down);
+                            UpdateDirections(new Position(i, j), tiles, Directions.Down);
                             break;
                         case Directions.Left:
-                            UpdateDirections(new Posistion(i, j), tiles, Directions.Left);
+                            UpdateDirections(new Position(i, j), tiles, Directions.Left);
                             break;
                         default:
                             break;
@@ -89,9 +89,9 @@ internal class Program {
             }
         }
     }
-    static bool UpdateDirections(Posistion position, TileInfo[][] tiles, Directions direction) {
+    static bool UpdateDirections(Position position, TileInfo[][] tiles, Directions direction) {
 
-        position += Posistion.GrowthVector(direction);
+        position += Position.GrowthVector(direction);
         switch (tiles[position.I][position.J].State) {
             case TileState.Empty:
                 return false;
@@ -102,7 +102,7 @@ internal class Program {
             case TileState.Blue:
                 //return true;
                 //tiles
-                return UpdateDirections(new Posistion(11, 2), tiles, direction);
+                return UpdateDirections(new Position(11, 2), tiles, direction);
                 break;
             default:
                 break;
@@ -123,8 +123,8 @@ internal class Program {
     }
 
     static bool MarkBlueTiles(TileInfo tile, Directions direction, int count) {
-        Posistion growth = Posistion.GrowthVector(direction);
-        Posistion target = tile.Posistion;
+        Position growth = Position.GrowthVector(direction);
+        Position target = tile.Posistion;
         for (int i = 0; i < count; i++) {
             target += growth;
             if (!target.IsInBounds()) return false;
@@ -174,9 +174,9 @@ internal class Program {
         return totalCount;
     }
     static int CountDirection(TileInfo tile, TileInfo.Directions direction) {
-        Posistion growth = Posistion.GrowthVector(direction); // functions like a vector in given direction
+        Position growth = Position.GrowthVector(direction); // functions like a vector in given direction
         int count = 0;
-        Posistion target = tile.Posistion;
+        Position target = tile.Posistion;
         while (true) {
             target += growth;
             if (!target.IsInBounds()) return count;
@@ -195,7 +195,7 @@ internal class Program {
         for (int i = 0; i < gridSize; i++) {
             tiles[i] = new TileInfo[gridSize];
             for (int j = 0; j < gridSize; j++) {
-                tiles[i][j] = new TileInfo(board.FindElement(By.Id($"tile-{i}-{j}")), new Posistion(i, j));
+                tiles[i][j] = new TileInfo(board.FindElement(By.Id($"tile-{i}-{j}")), new Position(i, j));
             }
         }
         return tiles;
