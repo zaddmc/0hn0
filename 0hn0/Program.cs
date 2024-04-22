@@ -24,11 +24,14 @@ internal class Program {
             webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
             Thread.Sleep(1000);
 
-            Console.WriteLine("do interraction");
-            Console.ReadLine();
+            if (false) { //wait for interraction
+                Console.WriteLine("do interraction");
+                Console.ReadLine();
+            }
 
             TileInfo[][] tiles = ReadWebTiles(webDriver);
             TileInfo[][] tilesRot = RotateMatrix(tiles);
+
 
             Algorithm(tiles); // this will solve the game
 
@@ -36,13 +39,17 @@ internal class Program {
 
             isRunning = false; // to only get it run once, could have been done with a do-while loop, but idc
         }
+        Console.WriteLine("done the deed");
     }
     static void Algorithm(TileInfo[][] tiles) {// this is the algorithm htat solves the game
-        foreach (var tile in notFulfilled) {
-            //Fulfill(tile);
-
-        }
-        DeadEndController(tiles);
+        TileState[][] preStates;
+        do {
+            preStates = CopyBoard(tiles);
+            for (int i = notFulfilled.Count - 1; i >= 0; i--) {
+                Fulfill(notFulfilled[i]);
+            }
+            //DeadEndController(tiles);
+        } while (!CompareBoard(tiles, preStates));
     }
     static void PrintResult(TileInfo[][] tiles, WebDriver webDriver) {
         for (int i = 0; i < gridSize; i++) {
@@ -70,7 +77,7 @@ internal class Program {
             for (int j = 0; j < gridSize; j++) {
                 foreach (Directions direction in tiles[i][j].OpenDirections) {
                     UpdateDirections(new Position(i, j), direction);
-                    
+
                 }
             }
         }
@@ -132,25 +139,29 @@ internal class Program {
         int totalCount = DoCount(tile);
         if (totalCount != tile.DesiredNumber) return false;
         foreach (Directions direction in tile.OpenDirections) {
-            MarkBlueTiles(tile, direction, CountDirection(tile, direction));
+            int countDirection = CountDirection(tile, direction);
+            MarkBlueTiles(tile, direction, countDirection);
+            MarkRedTile(tile, direction, countDirection);
         }
 
         TileInfo.notFulfilled.Remove(tile);
         tile.IsFulfilled = true;
         return true;
     }
-    static bool CloseFinishedEnd(TileInfo tile) {
+    static bool MarkRedTile(TileInfo tile, Directions direction, int count) {
         if (DoCount(tile) != tile.DesiredNumber) return false;
+        Position growth = Position.GrowthVector(direction);
+        Position target = tile.Posistion + growth * (count + 1);
 
-
-        foreach (var direction in tile.OpenDirections) {
-
+        if (!target.IsInBounds()) return false;
+        switch (target.ToTile().State) {
+            case TileState.Empty:
+                target.ToTile().State = TileState.Red;
+                return true;
+            case TileState.Red: return true;
+            case TileState.Blue: throw new ArgumentException("wants to make red, but it blue");
+            default: return false;
         }
-
-
-
-
-        return false;
     }
     static int DoCount(TileInfo tile) {
         int totalCount = 0;
@@ -166,7 +177,7 @@ internal class Program {
         while (true) {
             target += growth;
             if (!target.IsInBounds()) return count;
-            if (target.ToTile().State == TileState.Red) return count;
+            if (target.ToTile().State is TileState.Red or TileState.Empty) return count;
             count++;
         }
     }
