@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using static _0hn0.TileInfo;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace _0hn0;
@@ -45,10 +46,11 @@ internal class Program {
         TileState[][] preStates;
         do {
             preStates = CopyBoard(tiles);
+        UpdateDirectionsController(tiles);
+        DeadEndController(tiles);
             for (int i = notFulfilled.Count - 1; i >= 0; i--) {
                 Fulfill(notFulfilled[i]);
             }
-            //DeadEndController(tiles);
         } while (!CompareBoard(tiles, preStates));
     }
     static void PrintResult(TileInfo[][] tiles, WebDriver webDriver) {
@@ -72,20 +74,21 @@ internal class Program {
             }
         }
     }
-    static void UpdateDirectionsController(TileInfo[][] tiles) {
+    static void UpdateDirectionsController(TileInfo[][] tiles) {//Controls. makes an daouble array, that then seaches for endpoints in every direction
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                foreach (Directions direction in tiles[i][j].OpenDirections) {
-                    UpdateDirections(new Position(i, j), direction);
-
+                for (int number = tiles[i][j].OpenDirections.Count; number > 0; number--) { //searches open directions and then checks the opendirections if there are red in them
+                    if (UpdateDirections(new Position(i, j), tiles[i][j].OpenDirections[number-1])) {      
+                        tiles[i][j].OpenDirections.Remove(tiles[i][j].OpenDirections[number-1]); //deletes the direction if there are red
+                    }
                 }
             }
         }
     }
     static bool UpdateDirections(Position position, Directions direction) {
-
         position += Position.GrowthVector(direction);
-        switch (TileDict[position.ToString()].State) {
+        if (!position.IsInBounds()) return true;
+        switch (TileDict[position.ToString()].State) { //switch to differentiate between colors, if it is red, then it deletes the direction bcuz it returns true.
             case TileState.Empty:
                 return false;
                 break;
@@ -93,9 +96,7 @@ internal class Program {
                 return true;
                 break;
             case TileState.Blue:
-                //return true;
-                //tiles
-                return UpdateDirections(position, direction);
+                return false; //UpdateDirections(position, direction);
                 break;
             default:
                 break;
