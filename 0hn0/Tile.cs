@@ -1,4 +1,6 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.DevTools.V121.LayerTree;
+using OpenQA.Selenium.DevTools.V121.Overlay;
 using System.Collections.Generic;
 using static _0hn0.TileInfo;
 
@@ -55,12 +57,33 @@ public class TileInfo {
 
         TileDict.Add(posistion.ToString(), this);
     }
+    public static TileState[][] CopyBoard(TileInfo[][] tiles) {
+        TileState[][] states = new TileState[Program.gridSize][];
+        for (int i = 0; i < Program.gridSize; i++) {
+            states[i] = new TileState[Program.gridSize];
+            for (int j = 0; j < Program.gridSize; j++) {
+                states[i][j] = tiles[i][j].State;
+            }
+        }
+        return states;
+    }
+    public static bool CompareBoard(TileInfo[][] tiles, TileState[][] states) {
+        for (int i = 0; i < Program.gridSize; i++) {
+            for (int j = 0; j < Program.gridSize; j++) {
+                if (tiles[i][j].State != states[i][j]) return false;
+            }
+        }
+        return true;
+    }
 }
 public class Position(int i, int j) { // this is a an obejecct to resemble a posistion in a larger system
     public int I { get; set; } = i; // this is a variable in an possible object
     public int J { get; set; } = j; // this is a variable in an possible object
     public static Position operator +(Position main, Position other) {
         return new Position(main.I + other.I, main.J + other.J);
+    }
+    public static Position operator *(Position main, int x) {
+        return new Position(main.I * x, main.J * x);
     }
     public bool IsInBounds() {
         if (I < 0) return false;
