@@ -1,8 +1,7 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.DevTools.V121.LayerTree;
-using OpenQA.Selenium.DevTools.V121.Overlay;
 using System.Collections.Generic;
 using static _0hn0.TileInfo;
+using static _0hn0.Direction;
 
 namespace _0hn0;
 public class TileInfo {
@@ -14,13 +13,7 @@ public class TileInfo {
         Blue,
     }
     public TileState State { get; set; }
-    public enum Directions {
-        Up,
-        Right,
-        Down,
-        Left,
-    }
-    public List<Directions> OpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
+    public Direction Direction { get; set; } = new Direction();
     public IWebElement WebElement { get; private set; }
     public Position Posistion { get; private set; }
     public bool IsLocked { get; private set; }
@@ -50,10 +43,10 @@ public class TileInfo {
             default:
                 break;
         }
-        if (Posistion.I == 0) OpenDirections.Remove(Directions.Left);
-        if (Posistion.I == Program.gridSize - 1) OpenDirections.Remove(Directions.Right);
-        if (Posistion.J == 0) OpenDirections.Remove(Directions.Up);
-        if (Posistion.J == Program.gridSize - 1) OpenDirections.Remove(Directions.Down);
+        if (Posistion.I == 0) Direction.OpenDirections.Remove(Directions.Left);
+        if (Posistion.I == Program.gridSize - 1) Direction.OpenDirections.Remove(Directions.Right);
+        if (Posistion.J == 0) Direction.OpenDirections.Remove(Directions.Up);
+        if (Posistion.J == Program.gridSize - 1) Direction.OpenDirections.Remove(Directions.Down);
 
         TileDict.Add(posistion.ToString(), this);
     }
@@ -76,6 +69,17 @@ public class TileInfo {
         return true;
     }
 }
+public class Direction {
+    public enum Directions {
+        Up,
+        Right,
+        Down,
+        Left,
+    }
+    public List<Directions> OpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
+
+
+}
 public class Position(int i, int j) { // this is a an obejecct to resemble a posistion in a larger system
     public int I { get; set; } = i; // this is a variable in an possible object
     public int J { get; set; } = j; // this is a variable in an possible object
@@ -91,20 +95,20 @@ public class Position(int i, int j) { // this is a an obejecct to resemble a pos
         if (J < 0) return false;
         if (J > Program.gridSize - 1) return false;
         return true;
-    } 
+    }
     public override string ToString() {
         return $"{I}:{J}";
     }
     public TileInfo ToTile() {
         return TileInfo.TileDict[this.ToString()];
     }
-    static public Position GrowthVector(TileInfo.Directions direction) {
+    static public Position GrowthVector(Directions direction) {
         switch (direction) {
-            case Directions.Up: return new(0, -1); 
-            case Directions.Right: return new(1, 0); 
-            case Directions.Down: return new(0, 1); 
-            case Directions.Left: return new(-1, 0); 
-            default: return new(0, 0); 
+            case Directions.Up: return new(0, -1);
+            case Directions.Right: return new(1, 0);
+            case Directions.Down: return new(0, 1);
+            case Directions.Left: return new(-1, 0);
+            default: return new(0, 0);
         }
     }
 }
