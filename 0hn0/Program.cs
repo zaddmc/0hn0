@@ -3,6 +3,7 @@ using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using static _0hn0.Direction;
 using static _0hn0.TileInfo;
 
 
@@ -20,14 +21,11 @@ internal class Program {
 
 
         bool isRunning = true;
+        int runs = 1;
         while (isRunning) {
             webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
             Thread.Sleep(1000);
 
-            if (false) { //wait for interraction
-                Console.WriteLine("do interraction");
-                Console.ReadLine();
-            }
 
             TileInfo[][] tiles = ReadWebTiles(webDriver);
             TileInfo[][] tilesRot = RotateMatrix(tiles);
@@ -37,7 +35,15 @@ internal class Program {
 
             PrintResult(tiles, webDriver);
 
-            isRunning = false; // to only get it run once, could have been done with a do-while loop, but idc
+            if (true) { //wait for interraction
+                Console.WriteLine("do interraction");
+                Console.ReadLine();
+            }
+
+
+            if (runs <= 0) isRunning = false;
+            runs--;
+
         }
         Console.WriteLine("done the deed");
     }
@@ -45,10 +51,10 @@ internal class Program {
         TileState[][] preStates;
         do {
             preStates = CopyBoard(tiles);
-            //UpdateDirectionsController(tiles);
+            UpdateDirectionsController(tiles);
             //DeadEndController(tiles);
             for (int i = notFulfilled.Count - 1; i >= 0; i--) {
-                Fulfill(notFulfilled[i]);
+                SimpleFill(notFulfilled[i]);
             }
         } while (!CompareBoard(tiles, preStates));
     }
@@ -76,29 +82,24 @@ internal class Program {
     static void UpdateDirectionsController(TileInfo[][] tiles) {//Controls. makes an daouble array, that then seaches for endpoints in every direction
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                for (int number = tiles[i][j].OpenDirections.Count; number > 0; number--) { //searches open directions and then checks the opendirections if there are red in them
-                    if (UpdateDirections(new Position(i, j), tiles[i][j].OpenDirections[number - 1])) {
-                        tiles[i][j].OpenDirections.Remove(tiles[i][j].OpenDirections[number - 1]); //deletes the direction if there are red
+                for (int number = tiles[i][j].Direction.OpenDirections.Count; number > 0; number--) { //searches open directions and then checks the opendirections if there are red in them
+                    if (UpdateDirections(new Position(i, j), tiles[i][j].Direction.OpenDirections[number - 1], tiles[i][j])) {
+                        tiles[i][j].Direction.OpenDirections.Remove(tiles[i][j].Direction.OpenDirections[number - 1]); //deletes the direction if there are red
                     }
                 }
             }
         }
     }
-    static bool UpdateDirections(Position position, Directions direction) {
+    static bool UpdateDirections(Position position, Directions direction, TileInfo tile) {
         position += Position.GrowthVector(direction);
         if (!position.IsInBounds()) return true;
         switch (TileDict[position.ToString()].State) { //switch to differentiate between colors, if it is red, then it deletes the direction bcuz it returns true.
-            case TileState.Empty:
-                return false;
-                break;
-            case TileState.Red:
-                return true;
-                break;
+            case TileState.Empty: return false;
+            case TileState.Red: return true;
             case TileState.Blue:
-                return false; //UpdateDirections(position, direction);
-                break;
-            default:
-                break;
+                tile.Direction.Add(tile, position.ToTile(), direction);
+                return UpdateDirections(position, direction, tile);
+            default: break;
         }
         return false;
     }
@@ -106,7 +107,7 @@ internal class Program {
         bool returnState = false;
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                if (tiles[i][j].OpenDirections.Count == 0) {
+                if (tiles[i][j].Direction.OpenDirections.Count == 0) {
                     tiles[i][j].State = TileState.Red;
                     returnState = true;
                 }
@@ -128,21 +129,21 @@ internal class Program {
             if (targetTile.State == TileState.Blue) continue;
 
             targetTile.State = TileState.Blue;
-            targetTile.CurrentCount++;
+            //targetTile.CurrentCount++;
         }
         return true;
     }
-    static bool Fulfill(TileInfo tile) {
+    static bool SimpleFill(TileInfo tile) {
         (int blueCount, int availCount) theCount = DoCount(tile);
         if (theCount.blueCount == tile.DesiredNumber) {
-            foreach (Directions direction in tile.OpenDirections) {
+            foreach (Directions direction in tile.Direction.OpenDirections) {
                 int countDirection = CountDirection(tile, direction).blueCount;
                 MarkBlueTiles(tile, direction, countDirection);
                 MarkRedTile(tile, direction, countDirection);
             }
         }
         else if (theCount.availCount == tile.DesiredNumber) {
-            foreach (Directions direction in tile.OpenDirections) {
+            foreach (Directions direction in tile.Direction.OpenDirections) {
                 int countDirection = CountDirection(tile, direction).availableCount;
                 MarkBlueTiles(tile, direction, countDirection);
                 MarkRedTile(tile, direction, countDirection);
@@ -171,14 +172,14 @@ internal class Program {
     }
     static (int blueCount, int availableCount) DoCount(TileInfo tile) {
         int blueCount = 0, availableCount = 0;
-        foreach (var direction in tile.OpenDirections) {
+        foreach (Directions direction in Direction.AllDirections) {
             var temp = CountDirection(tile, direction);
             blueCount += temp.blueCount;
             availableCount += temp.availableCount;
         }
         return (blueCount, availableCount);
     }
-    static (int blueCount, int availableCount) CountDirection(TileInfo tile, TileInfo.Directions direction) {
+    static (int blueCount, int availableCount) CountDirection(TileInfo tile, Directions direction) {
         Position growth = Position.GrowthVector(direction); // functions like a vector in given direction
         int blueCount = 0, availableCount = 0;
         Position target = tile.Posistion;
