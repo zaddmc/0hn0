@@ -75,20 +75,21 @@ public class Direction {
         Down,
         Left,
     }
+    static public Directions[] AllDirections { get; private set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
     public List<Directions> OpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
-    public List<TileInfo> UpList { get; set; } = [];
-    public List<TileInfo> RightList { get; set; } = [];
-    public List<TileInfo> DownList { get; set; } = [];
-    public List<TileInfo> LeftList { get; set; } = [];
-    public void Add(TileInfo tile, Directions direction) {
+    public HashSet<TileInfo> UpList { get; set; } = [];
+    public HashSet<TileInfo> RightList { get; set; } = [];
+    public HashSet<TileInfo> DownList { get; set; } = [];
+    public HashSet<TileInfo> LeftList { get; set; } = [];
+    public void Add(TileInfo tile, TileInfo tileToAdd, Directions direction) {
         switch (direction) {
-            case Directions.Up: UpList.Add(tile); break;
-            case Directions.Right: RightList.Add(tile); break;
-            case Directions.Down: DownList.Add(tile); break;
-            case Directions.Left: LeftList.Add(tile); break;
+            case Directions.Up: UpList.Add(tileToAdd); break;
+            case Directions.Right: RightList.Add(tileToAdd); break;
+            case Directions.Down: DownList.Add(tileToAdd); break;
+            case Directions.Left: LeftList.Add(tileToAdd); break;
             default: break;
         }
-        (tile.Posistion - Position.GrowthVector(direction)).ToTile().CurrentCount = (UpList.Count + RightList.Count + DownList.Count + LeftList.Count);
+        tile.CurrentCount = (UpList.Count + RightList.Count + DownList.Count + LeftList.Count);
     }
 
 }
