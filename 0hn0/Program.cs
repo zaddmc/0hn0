@@ -79,6 +79,7 @@ internal class Program {
             }
         }
     }
+    
     static void UpdateDirectionsController(TileInfo[][] tiles) {//Controls. makes an daouble array, that then seaches for endpoints in every direction
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {

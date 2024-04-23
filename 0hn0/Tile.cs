@@ -1,6 +1,5 @@
 ﻿using OpenQA.Selenium;
 using System.Collections.Generic;
-using static _0hn0.TileInfo;
 using static _0hn0.Direction;
 
 namespace _0hn0;
@@ -77,7 +76,20 @@ public class Direction {
         Left,
     }
     public List<Directions> OpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
-
+    public List<TileInfo> UpList { get; set; } = [];
+    public List<TileInfo> RightList { get; set; } = [];
+    public List<TileInfo> DownList { get; set; } = [];
+    public List<TileInfo> LeftList { get; set; } = [];
+    public void Add(TileInfo tile, Directions direction) {
+        switch (direction) {
+            case Directions.Up: UpList.Add(tile); break;
+            case Directions.Right: RightList.Add(tile); break;
+            case Directions.Down: DownList.Add(tile); break;
+            case Directions.Left: LeftList.Add(tile); break;
+            default: break;
+        }
+        (tile.Posistion - Position.GrowthVector(direction)).ToTile().CurrentCount = (UpList.Count + RightList.Count + DownList.Count + LeftList.Count);
+    }
 
 }
 public class Position(int i, int j) { // this is a an obejecct to resemble a posistion in a larger system
@@ -85,6 +97,9 @@ public class Position(int i, int j) { // this is a an obejecct to resemble a pos
     public int J { get; set; } = j; // this is a variable in an possible object
     public static Position operator +(Position main, Position other) {
         return new Position(main.I + other.I, main.J + other.J);
+    }
+    public static Position operator -(Position main, Position other) {
+        return new Position(main.I - other.I, main.J - other.J);
     }
     public static Position operator *(Position main, int x) {
         return new Position(main.I * x, main.J * x);
