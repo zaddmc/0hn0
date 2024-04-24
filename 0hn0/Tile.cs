@@ -47,6 +47,11 @@ public class TileInfo {
         if (Posistion.J == 0) Direction.OpenDirections.Remove(Directions.Up);
         if (Posistion.J == Program.gridSize - 1) Direction.OpenDirections.Remove(Directions.Down);
 
+        if (Posistion.I == 0) Direction.SemiOpenDirections.Remove(Directions.Left);
+        if (Posistion.I == Program.gridSize - 1) Direction.SemiOpenDirections.Remove(Directions.Right);
+        if (Posistion.J == 0) Direction.SemiOpenDirections.Remove(Directions.Up);
+        if (Posistion.J == Program.gridSize - 1) Direction.SemiOpenDirections.Remove(Directions.Down);
+
         TileDict.Add(posistion.ToString(), this);
     }
     public static TileState[][] CopyBoard(TileInfo[][] tiles) {
@@ -77,6 +82,7 @@ public class Direction {
     }
     static public Directions[] AllDirections { get; private set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
     public List<Directions> OpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
+    public List<Directions> SemiOpenDirections { get; set; } = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
     public HashSet<TileInfo> UpList { get; set; } = [];
     public HashSet<TileInfo> RightList { get; set; } = [];
     public HashSet<TileInfo> DownList { get; set; } = [];
