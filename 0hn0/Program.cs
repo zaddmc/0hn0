@@ -51,20 +51,20 @@ internal class Program {
         TileState[][] preStates;
         do {
             preStates = CopyBoard(tiles);
-            //UpdateDirectionsController(tiles);
+            UpdateDirectionsController(tiles);
             DeadEndController(tiles);
-            /*foreach (TileInfo tile in notFulfilled) {
+            foreach (TileInfo tile in notFulfilled) {
 
                 SimpleFill(tile);
                 FillWithOpenEnds(tile);
                 OverflowSolver(tile);
-            }*/
+            }
 
             for (int i = notFulfilled.Count - 1; i >= 0; i--)
                 if (notFulfilled[i].DesiredNumber == notFulfilled[i].CurrentCount)
                     notFulfilled.RemoveAt(i);
 
-        } while (!CompareBoard(tiles, preStates)); // !CompareBoard(tiles, preStates)
+        } while (!CompareBoard(tiles, preStates)); 
         return IsDone(tiles);
 
     }
