@@ -2,7 +2,6 @@
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using static _0hn0.Direction;
 using static _0hn0.TileInfo;
@@ -63,10 +62,10 @@ internal class Program {
                 OverflowSolver(tile);
             }
 
-            for (int i = notFulfilled.Count - 1; i >= 0; i--) 
-                if (notFulfilled[i].DesiredNumber == notFulfilled[i].CurrentCount) 
+            for (int i = notFulfilled.Count - 1; i >= 0; i--)
+                if (notFulfilled[i].DesiredNumber == notFulfilled[i].CurrentCount)
                     notFulfilled.RemoveAt(i);
-            
+
         } while (!CompareBoard(tiles, preStates)); // !CompareBoard(tiles, preStates)
         return IsDone(tiles);
 
@@ -148,14 +147,12 @@ internal class Program {
     static bool OverflowSolver(TileInfo tile) {
 
 
-
         return false;
     }
     static bool FillWithOpenEnds(TileInfo tile) {
         List<int> openEnds = new List<int>();
-        for (int i = 0; i < tile.Direction.SemiOpenDirections.Count; i++) {
+        for (int i = 0; i < tile.Direction.SemiOpenDirections.Count; i++)
             openEnds.Add(CountDirection(tile, tile.Direction.SemiOpenDirections[i]).availableCount);
-        }
 
         for (int i = 0; i < openEnds.Count; i++) {
             int tally = 0;
@@ -163,13 +160,9 @@ internal class Program {
                 if (i == j) continue;
                 tally += openEnds[j];
             }
-            if (tally <= tile.DesiredNumber) {
+            if (tally <= tile.DesiredNumber)
                 MarkBlueTiles(tile, tile.Direction.SemiOpenDirections[i], tile.DesiredNumber - tally);
-            }
         }
-
-
-
         return false;
     }
     static bool MarkBlueTiles(TileInfo tile, Directions direction, int count) {
