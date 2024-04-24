@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using static _0hn0.Direction;
 using static _0hn0.TileInfo;
@@ -21,7 +22,7 @@ internal class Program {
 
 
         bool isRunning = true;
-        int runs = 1;
+        int runs = 5;
         while (isRunning) {
             webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
             Thread.Sleep(1000);
@@ -31,13 +32,15 @@ internal class Program {
             TileInfo[][] tilesRot = RotateMatrix(tiles);
 
 
-            Algorithm(tiles); // this will solve the game
+            bool block = !Algorithm(tiles); // this will solve the game
 
             PrintResult(tiles, webDriver);
 
-            if (true) { //wait for interraction
+            if (block) { //wait for interraction
                 Console.WriteLine("do interraction");
                 Console.ReadLine();
+
+                Algorithm(tiles); // to test in boards where it failed
             }
 
 
@@ -47,16 +50,25 @@ internal class Program {
         }
         Console.WriteLine("done the deed");
     }
-    static void Algorithm(TileInfo[][] tiles) {// this is the algorithm htat solves the game
+    static bool Algorithm(TileInfo[][] tiles) {// this is the algorithm htat solves the game
         TileState[][] preStates;
         do {
             preStates = CopyBoard(tiles);
             UpdateDirectionsController(tiles);
             //DeadEndController(tiles);
-            for (int i = notFulfilled.Count - 1; i >= 0; i--) {
-                SimpleFill(notFulfilled[i]);
+            foreach (TileInfo tile in notFulfilled) {
+
+                SimpleFill(tile);
+                FillWithOpenEnds(tile);
+                OverflowSolver(tile);
             }
-        } while (!CompareBoard(tiles, preStates));
+
+            for (int i = notFulfilled.Count - 1; i >= 0; i--) 
+                if (notFulfilled[i].DesiredNumber == notFulfilled[i].CurrentCount) 
+                    notFulfilled.RemoveAt(i);
+            
+        } while (!CompareBoard(tiles, preStates)); // !CompareBoard(tiles, preStates)
+        return IsDone(tiles);
     }
     static void PrintResult(TileInfo[][] tiles, WebDriver webDriver) {
         for (int i = 0; i < gridSize; i++) {
@@ -115,7 +127,32 @@ internal class Program {
         }
         return returnState;
     }
+    static bool OverflowSolver(TileInfo tile) {
 
+
+
+        return false;
+    }
+    static bool FillWithOpenEnds(TileInfo tile) {
+        List<int> openEnds = new List<int>();
+        for (int i = 0; i < tile.Direction.SemiOpenDirections.Count; i++) {
+            openEnds.Add(CountDirection(tile, tile.Direction.SemiOpenDirections[i]).availableCount);
+        }
+
+        for (int i = 0; i < openEnds.Count; i++) {
+            int tally = 0;
+            for (int j = 0; j < openEnds.Count; j++) {
+                if (i == j) continue;
+                tally += openEnds[j];
+            }
+            if (tally <= tile.DesiredNumber) {
+                MarkBlueTiles(tile, tile.Direction.SemiOpenDirections[i], tile.DesiredNumber - tally);
+            }
+        }
+
+
+        return false;
+    }
     static bool MarkBlueTiles(TileInfo tile, Directions direction, int count) {
         Position growth = Position.GrowthVector(direction);
         Position target = tile.Posistion;
@@ -151,8 +188,6 @@ internal class Program {
         }
         else return false;
 
-        TileInfo.notFulfilled.Remove(tile);
-        tile.IsFulfilled = true;
         return true;
     }
     static bool MarkRedTile(TileInfo tile, Directions direction, int count) {
