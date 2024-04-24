@@ -51,11 +51,11 @@ internal class Program {
         TileState[][] preStates;
         do {
             preStates = CopyBoard(tiles);
-            UpdateDirectionsController(tiles);
-            //DeadEndController(tiles);
-            for (int i = notFulfilled.Count - 1; i >= 0; i--) {
-                SimpleFill(notFulfilled[i]);
-            }
+            //UpdateDirectionsController(tiles);
+            DeadEndController(tiles);
+            //for (int i = notFulfilled.Count - 1; i >= 0; i--) {
+            //SimpleFill(notFulfilled[i]);
+            //}
         } while (!CompareBoard(tiles, preStates));
     }
     static void PrintResult(TileInfo[][] tiles, WebDriver webDriver) {
@@ -107,13 +107,28 @@ internal class Program {
         bool returnState = false;
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                if (tiles[i][j].Direction.OpenDirections.Count == 0) {
+                uint amountOfDeadEnds = 0;
+                foreach (Directions direction in Direction.AllDirections) {
+                    if (IsDeadEnd(tiles, tiles[i][j].Posistion, direction)) {
+                        amountOfDeadEnds++;
+                    }
+                }
+                if (amountOfDeadEnds == 4) {
                     tiles[i][j].State = TileState.Red;
-                    returnState = true;
                 }
             }
         }
         return returnState;
+    }
+    static bool IsDeadEnd(TileInfo[][] tiles, Position position, Directions direction) {
+        position += Position.GrowthVector(direction);
+        if (!position.IsInBounds()) return true;
+        switch (tiles[position.I][position.J].State) {
+            case TileState.Empty: return false;
+            case TileState.Red: return true;
+            case TileState.Blue: return false;
+            default: return false;
+        }
     }
 
     static bool MarkBlueTiles(TileInfo tile, Directions direction, int count) {
