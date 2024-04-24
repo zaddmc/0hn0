@@ -27,7 +27,6 @@ internal class Program {
             webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
             Thread.Sleep(1000);
 
-
             TileInfo[][] tiles = ReadWebTiles(webDriver);
             TileInfo[][] tilesRot = RotateMatrix(tiles);
 
@@ -39,7 +38,6 @@ internal class Program {
             if (block) { //wait for interraction
                 Console.WriteLine("do interraction");
                 Console.ReadLine();
-
                 Algorithm(tiles); // to test in boards where it failed
             }
 
@@ -54,14 +52,14 @@ internal class Program {
         TileState[][] preStates;
         do {
             preStates = CopyBoard(tiles);
-            UpdateDirectionsController(tiles);
+            //UpdateDirectionsController(tiles);
             DeadEndController(tiles);
-            foreach (TileInfo tile in notFulfilled) {
+            /*foreach (TileInfo tile in notFulfilled) {
 
                 SimpleFill(tile);
                 FillWithOpenEnds(tile);
                 OverflowSolver(tile);
-            }
+            }*/
 
             for (int i = notFulfilled.Count - 1; i >= 0; i--) 
                 if (notFulfilled[i].DesiredNumber == notFulfilled[i].CurrentCount) 
@@ -143,6 +141,16 @@ internal class Program {
             case TileState.Blue: return false;
             default: return false;
         }
+    }
+    static bool LastOpenFill(TileInfo tile) {
+        bool returnState = false;
+        if (tile.State==TileState.Blue) {
+            
+        }
+
+
+
+        return returnState;
     }
 
     static bool OverflowSolver(TileInfo tile) {
