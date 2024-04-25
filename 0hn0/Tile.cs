@@ -14,15 +14,15 @@ public class TileInfo {
     public TileState State { get; set; }
     public Direction Direction { get; set; } = new Direction();
     public IWebElement WebElement { get; private set; }
-    public Position Posistion { get; private set; }
+    public Position Position { get; private set; }
     public bool IsLocked { get; private set; }
     public bool IsFulfilled { get; set; } = false;
     public int DesiredNumber { get; private set; }
     public int CurrentCount { get; set; }
 
-    public TileInfo(IWebElement element, Position posistion) {
+    public TileInfo(IWebElement element, Position position) {
         WebElement = element;
-        Posistion = posistion;
+        Position = position;
         switch (element.GetAttribute("class")) {
             case "tile tile-":
                 State = TileState.Empty;
@@ -42,17 +42,17 @@ public class TileInfo {
             default:
                 break;
         }
-        if (Posistion.I == 0) Direction.OpenDirections.Remove(Directions.Left);
-        if (Posistion.I == Program.gridSize - 1) Direction.OpenDirections.Remove(Directions.Right);
-        if (Posistion.J == 0) Direction.OpenDirections.Remove(Directions.Up);
-        if (Posistion.J == Program.gridSize - 1) Direction.OpenDirections.Remove(Directions.Down);
+        if (Position.I == 0) Direction.OpenDirections.Remove(Directions.Left);
+        if (Position.I == Program.gridSize - 1) Direction.OpenDirections.Remove(Directions.Right);
+        if (Position.J == 0) Direction.OpenDirections.Remove(Directions.Up);
+        if (Position.J == Program.gridSize - 1) Direction.OpenDirections.Remove(Directions.Down);
 
-        if (Posistion.I == 0) Direction.SemiOpenDirections.Remove(Directions.Left);
-        if (Posistion.I == Program.gridSize - 1) Direction.SemiOpenDirections.Remove(Directions.Right);
-        if (Posistion.J == 0) Direction.SemiOpenDirections.Remove(Directions.Up);
-        if (Posistion.J == Program.gridSize - 1) Direction.SemiOpenDirections.Remove(Directions.Down);
+        if (Position.I == 0) Direction.SemiOpenDirections.Remove(Directions.Left);
+        if (Position.I == Program.gridSize - 1) Direction.SemiOpenDirections.Remove(Directions.Right);
+        if (Position.J == 0) Direction.SemiOpenDirections.Remove(Directions.Up);
+        if (Position.J == Program.gridSize - 1) Direction.SemiOpenDirections.Remove(Directions.Down);
 
-        TileDict.Add(posistion.ToString(), this);
+        TileDict.Add(position.ToString(), this);
     }
     public static TileState[][] CopyBoard(TileInfo[][] tiles) {
         TileState[][] states = new TileState[Program.gridSize][];
