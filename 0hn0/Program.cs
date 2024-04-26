@@ -64,7 +64,7 @@ internal class Program {
                 if (notFulfilled[i].DesiredNumber == notFulfilled[i].CurrentCount)
                     notFulfilled.RemoveAt(i);
 
-        } while (!CompareBoard(tiles, preStates)); 
+        } while (!CompareBoard(tiles, preStates));
         return IsDone(tiles);
 
     }
@@ -118,8 +118,8 @@ internal class Program {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 uint amountOfDeadEnds = 0;
-                foreach (Directions direction in Direction.AllDirections) {
-                    if (IsDeadEnd(tiles, tiles[i][j].Position, direction)) {
+                foreach (Directions direction in tiles[i][j].Direction.SemiOpenDirections) {
+                    if (IsDeadEnd(tiles, tiles[i][j].Posistion, direction)) {
                         amountOfDeadEnds++;
                     }
                 }
@@ -143,11 +143,23 @@ internal class Program {
     }
     static bool LastOpenFill(TileInfo tile) {
         bool returnState = false;
-        if (tile.State==TileState.Blue) {
-            
+        if (tile.Direction.OpenDirections.Count != 1) { return false; }
+        List<int> openEnds = new List<int>();
+        for (int i = 0; i < tile.Direction.SemiOpenDirections.Count; i++)
+            openEnds.Add(CountDirection(tile, tile.Direction.SemiOpenDirections[i]).AvailableCount);
+
+        int amountofBlue=0;
+        foreach (int item in openEnds) {
+            amountofBlue += item;
         }
+        Position targetPosition = tile.Posistion;
+        Directions direction = tile.Direction.OpenDirections[0];
+        for (int i = 0; i < tile.DesiredNumber - amountofBlue; i++) {
+            targetPosition+= Position.GrowthVector(direction);
+        }
+        if () {
 
-
+        }
 
         return returnState;
     }
