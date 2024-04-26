@@ -146,7 +146,7 @@ internal class Program {
         if (tile.Direction.OpenDirections.Count != 1) { return false; }
         List<int> openEnds = new List<int>();
         for (int i = 0; i < tile.Direction.SemiOpenDirections.Count; i++)
-            openEnds.Add(CountDirection(tile, tile.Direction.SemiOpenDirections[i]).availableCount);
+            openEnds.Add(CountDirection(tile, tile.Direction.SemiOpenDirections[i]).AvailableCount);
 
         int amountofBlue=0;
         foreach (int item in openEnds) {
@@ -165,14 +165,16 @@ internal class Program {
     }
 
     static bool OverflowSolver(TileInfo tile) {
+        for (int i = 0; i < tile.Direction.OpenDirections.Count; i++) {
 
+        }
 
         return false;
     }
     static bool FillWithOpenEnds(TileInfo tile) {
         List<int> openEnds = new List<int>();
         for (int i = 0; i < tile.Direction.SemiOpenDirections.Count; i++)
-            openEnds.Add(CountDirection(tile, tile.Direction.SemiOpenDirections[i]).availableCount);
+            openEnds.Add(CountDirection(tile, tile.Direction.SemiOpenDirections[i]).AvailableCount);
 
         for (int i = 0; i < openEnds.Count; i++) {
             int tally = 0;
@@ -185,9 +187,16 @@ internal class Program {
         }
         return false;
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tile"></param>
+    /// <param name="direction"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
     static bool MarkBlueTiles(TileInfo tile, Directions direction, int count) {
         Position growth = Position.GrowthVector(direction);
-        Position target = tile.Posistion;
+        Position target = tile.Position;
         for (int i = 0; i < count; i++) {
             target += growth;
             if (!target.IsInBounds()) return false;
@@ -206,14 +215,14 @@ internal class Program {
         (int blueCount, int availCount) theCount = DoCount(tile);
         if (theCount.blueCount == tile.DesiredNumber) {
             foreach (Directions direction in tile.Direction.OpenDirections) {
-                int countDirection = CountDirection(tile, direction).blueCount;
+                int countDirection = CountDirection(tile, direction).BlueCount;
                 MarkBlueTiles(tile, direction, countDirection);
                 MarkRedTile(tile, direction, countDirection);
             }
         }
         else if (theCount.availCount == tile.DesiredNumber) {
             foreach (Directions direction in tile.Direction.OpenDirections) {
-                int countDirection = CountDirection(tile, direction).availableCount;
+                int countDirection = CountDirection(tile, direction).AvailableCount;
                 MarkBlueTiles(tile, direction, countDirection);
                 MarkRedTile(tile, direction, countDirection);
             }
@@ -222,11 +231,19 @@ internal class Program {
 
         return true;
     }
+    /// <summary>
+    /// Will mark 1 tile red at the end of count
+    /// </summary>
+    /// <param name="tile">The tile of origin</param>
+    /// <param name="direction">The direction of the tile to mark a Red tile</param>
+    /// <param name="count">How far out the red tile should be</param>
+    /// <returns>Returns a bool where true would mean it succesfully marked a tile red or already red, and false if it failed to mark red</returns>
+    /// <exception cref="ArgumentException">If the tile that should be marked red was blue it will throw this exception</exception>
     static bool MarkRedTile(TileInfo tile, Directions direction, int count) {
-        if (DoCount(tile).blueCount != tile.DesiredNumber) return false;
+        if (DoCount(tile).BlueCount != tile.DesiredNumber) return false;
         Position growth = Position.GrowthVector(direction);
-        Position target = tile.Posistion + growth * (count + 1);
-
+        Position target = tile.Position + growth * (count + 1);
+        
         if (!target.IsInBounds()) return false;
         switch (target.ToTile().State) {
             case TileState.Empty:
@@ -237,19 +254,30 @@ internal class Program {
             default: return false;
         }
     }
-    static (int blueCount, int availableCount) DoCount(TileInfo tile) {
+    /// <summary>
+    /// Counts all possible directions of given tile
+    /// </summary>
+    /// <param name="tile">The tile of which will be orign of count</param>
+    /// <returns>Bluecount all continous blueconnected to the origin tile, Availcount any open tile conneceted to the origin tile</returns>
+    static (int BlueCount, int AvailableCount) DoCount(TileInfo tile) {
         int blueCount = 0, availableCount = 0;
         foreach (Directions direction in Direction.AllDirections) {
             var temp = CountDirection(tile, direction);
-            blueCount += temp.blueCount;
-            availableCount += temp.availableCount;
+            blueCount += temp.BlueCount;
+            availableCount += temp.AvailableCount;
         }
         return (blueCount, availableCount);
     }
-    static (int blueCount, int availableCount) CountDirection(TileInfo tile, Directions direction) {
+    /// <summary>
+    /// Count given direction
+    /// </summary>
+    /// <param name="tile">The tile of Origin to count from</param>
+    /// <param name="direction">The direction in which to count</param>
+    /// <returns>BlueCount is how many Blues in given direction that is connected to the origin tile, AvailableCount is all free tiles including blue and gray, only stops at red tiles, which arent</returns>
+    static (int BlueCount, int AvailableCount) CountDirection(TileInfo tile, Directions direction) {
         Position growth = Position.GrowthVector(direction); // functions like a vector in given direction
         int blueCount = 0, availableCount = 0;
-        Position target = tile.Posistion;
+        Position target = tile.Position;
         bool latch = false;
         while (true) {
             target += growth;
