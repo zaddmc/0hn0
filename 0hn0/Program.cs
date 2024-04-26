@@ -54,10 +54,10 @@ internal class Program {
             UpdateDirectionsController(tiles);
             DeadEndController(tiles);
             foreach (TileInfo tile in notFulfilled) {
-
                 SimpleFill(tile);
                 FillWithOpenEnds(tile);
                 OverflowSolver(tile);
+                LastOpenFill(tile);
             }
 
             for (int i = notFulfilled.Count - 1; i >= 0; i--)
@@ -143,24 +143,13 @@ internal class Program {
     }
     static bool LastOpenFill(TileInfo tile) {
         bool returnState = false;
-        if (tile.Direction.OpenDirections.Count != 1) { return false; }
-        List<int> openEnds = new List<int>();
-        for (int i = 0; i < tile.Direction.SemiOpenDirections.Count; i++)
-            openEnds.Add(CountDirection(tile, tile.Direction.SemiOpenDirections[i]).AvailableCount);
-
-        int amountofBlue=0;
-        foreach (int item in openEnds) {
-            amountofBlue += item;
+        if (tile.Direction.OpenDirections.Count is 0 or >1) {
+            return returnState;
         }
-        Position targetPosition = tile.Position;
+        int amountOfBlue = DoCount(tile).BlueCount;
         Directions direction = tile.Direction.OpenDirections[0];
-        for (int i = 0; i < tile.DesiredNumber - amountofBlue; i++) {
-            targetPosition+= Position.GrowthVector(direction);
-        }
-        if (false) {
-
-        }
-
+        returnState = MarkBlueTiles(tile, tile.Direction.OpenDirections[0], tile.DesiredNumber - amountOfBlue + CountDirection(tile, direction).BlueCount);
+        MarkRedTile(tile, tile.Direction.OpenDirections[0], tile.DesiredNumber - amountOfBlue + CountDirection(tile, direction).BlueCount); //change true to this later, so the markasred is not needed
         return returnState;
     }
 
@@ -243,7 +232,7 @@ internal class Program {
         if (DoCount(tile).BlueCount != tile.DesiredNumber) return false;
         Position growth = Position.GrowthVector(direction);
         Position target = tile.Position + growth * (count + 1);
-        
+
         if (!target.IsInBounds()) return false;
         switch (target.ToTile().State) {
             case TileState.Empty:
