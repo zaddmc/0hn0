@@ -119,7 +119,7 @@ internal class Program {
             for (int j = 0; j < gridSize; j++) {
                 uint amountOfDeadEnds = 0;
                 foreach (Directions direction in tiles[i][j].Direction.SemiOpenDirections) {
-                    if (IsDeadEnd(tiles, tiles[i][j].Posistion, direction)) {
+                    if (IsDeadEnd(tiles, tiles[i][j].Position, direction)) {
                         amountOfDeadEnds++;
                     }
                 }
@@ -152,12 +152,12 @@ internal class Program {
         foreach (int item in openEnds) {
             amountofBlue += item;
         }
-        Position targetPosition = tile.Posistion;
+        Position targetPosition = tile.Position;
         Directions direction = tile.Direction.OpenDirections[0];
         for (int i = 0; i < tile.DesiredNumber - amountofBlue; i++) {
             targetPosition+= Position.GrowthVector(direction);
         }
-        if () {
+        if (false) {
 
         }
 
