@@ -47,7 +47,7 @@ internal class Program {
         }
         Console.WriteLine("done the deed");
     }
-    static bool Algorithm(TileInfo[][] tiles) {// this is the algorithm htat solves the game
+    static bool Algorithm(TileInfo[][] tiles) {// this is the algorithm that solves the game
         TileState[][] preStates;
         do {
             preStates = CopyBoard(tiles);
