@@ -118,7 +118,7 @@ internal class Program {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 uint amountOfDeadEnds = 0;
-                foreach (Directions direction in tiles[i][j].Direction.SemiOpenDirections) {
+                foreach (Directions direction in Direction.AllDirections) {
                     if (IsDeadEnd(tiles, tiles[i][j].Position, direction)) {
                         amountOfDeadEnds++;
                     }
@@ -154,8 +154,23 @@ internal class Program {
     }
 
     static bool OverflowSolver(TileInfo tile) {
-        for (int i = 0; i < tile.Direction.OpenDirections.Count; i++) {
 
+        for (int i = 0; i < tile.Direction.OpenDirections.Count; i++) {
+            Directions direction = tile.Direction.OpenDirections[i];
+            Position growthVector = Position.GrowthVector(direction);
+            Position target = tile.Position;
+
+            int potentielAddCount = 0;
+            while (target.IsInBounds() && target.ToTile().State != TileState.Red) {
+                if (target.ToTile().State == TileState.Empty) {
+                    potentielAddCount += CountDirection(target.ToTile(), direction).BlueCount;
+                    break;
+                }
+                target += growthVector;
+            }
+            if(DoCount(tile).BlueCount + potentielAddCount + 1> tile.DesiredNumber) {
+                MarkRedTile(tile, direction, CountDirection(tile, direction).BlueCount);
+            }
         }
 
         return false;
@@ -182,8 +197,9 @@ internal class Program {
     /// <param name="tile"></param>
     /// <param name="direction"></param>
     /// <param name="count"></param>
+    /// <param name="markRed"></param>
     /// <returns></returns>
-    static bool MarkBlueTiles(TileInfo tile, Directions direction, int count) {
+    static bool MarkBlueTiles(TileInfo tile, Directions direction, int count, bool markRed = false) {
         Position growth = Position.GrowthVector(direction);
         Position target = tile.Position;
         for (int i = 0; i < count; i++) {
@@ -196,8 +212,11 @@ internal class Program {
             if (targetTile.State == TileState.Blue) continue;
 
             targetTile.State = TileState.Blue;
-            //targetTile.CurrentCount++;
+            //target.CurrentCount++;
         }
+        if (markRed)
+            MarkRedTile(tile, direction, count);
+
         return true;
     }
     static bool SimpleFill(TileInfo tile) {
@@ -229,10 +248,9 @@ internal class Program {
     /// <returns>Returns a bool where true would mean it succesfully marked a tile red or already red, and false if it failed to mark red</returns>
     /// <exception cref="ArgumentException">If the tile that should be marked red was blue it will throw this exception</exception>
     static bool MarkRedTile(TileInfo tile, Directions direction, int count) {
-        if (DoCount(tile).BlueCount != tile.DesiredNumber) return false;
+        //if (DoCount(tile).BlueCount != tile.DesiredNumber) return false;
         Position growth = Position.GrowthVector(direction);
         Position target = tile.Position + growth * (count + 1);
-
         if (!target.IsInBounds()) return false;
         switch (target.ToTile().State) {
             case TileState.Empty:
@@ -263,7 +281,7 @@ internal class Program {
     /// <param name="tile">The tile of Origin to count from</param>
     /// <param name="direction">The direction in which to count</param>
     /// <returns>BlueCount is how many Blues in given direction that is connected to the origin tile, AvailableCount is all free tiles including blue and gray, only stops at red tiles, which arent</returns>
-    static (int BlueCount, int AvailableCount) CountDirection(TileInfo tile, Directions direction) {
+    static (int BlueCount, int AvailableCount) CountDirection(TileInfo tile, Directions direction, bool includeLatch = true) {
         Position growth = Position.GrowthVector(direction); // functions like a vector in given direction
         int blueCount = 0, availableCount = 0;
         Position target = tile.Position;
@@ -273,7 +291,7 @@ internal class Program {
             if (!target.IsInBounds()) return (blueCount, availableCount);
             if (target.ToTile().State == TileState.Red) return (blueCount, availableCount);
             availableCount++;
-            if (target.ToTile().State == TileState.Empty || latch) { latch = true; continue; }
+            if (target.ToTile().State == TileState.Empty || latch && includeLatch) { latch = true; continue; }
             blueCount++;
         }
     }
