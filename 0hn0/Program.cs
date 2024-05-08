@@ -10,7 +10,7 @@ using static _0hn0.TileInfo;
 namespace _0hn0;
 
 internal class Program {
-    public static int gridSize = 4;
+    public static int gridSize = 9;
 
     static void Main(string[] args) {
 
@@ -21,7 +21,7 @@ internal class Program {
 
 
         bool isRunning = true;
-        int runs = 5;
+        int runs = 100;
         while (isRunning) {
             webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
             Thread.Sleep(1000);
@@ -31,7 +31,7 @@ internal class Program {
 
 
             bool block = !Algorithm(tiles); // this will solve the game
-
+            
             PrintResult(tiles, webDriver);
 
             if (block) { //wait for interraction
@@ -39,7 +39,7 @@ internal class Program {
                 Console.ReadLine();
                 Algorithm(tiles); // to test in boards where it failed
             }
-
+            Thread.Sleep(1000);
 
             if (runs <= 0) isRunning = false;
             runs--;
@@ -57,7 +57,7 @@ internal class Program {
                 SimpleFill(tile);
                 FillWithOpenEnds(tile);
                 OverflowSolver(tile);
-                LastOpenFill(tile);
+                //LastOpenFill(tile);
             }
 
             for (int i = notFulfilled.Count - 1; i >= 0; i--)
@@ -115,8 +115,8 @@ internal class Program {
     }
     static bool DeadEndController(TileInfo[][] tiles) {
         bool returnState = false;
-        for (int i = 0; i < gridSize; i++) {
-            for (int j = 0; j < gridSize; j++) {
+        for (byte i = 0; i < gridSize; i++) {
+            for (byte j = 0; j < gridSize; j++) {
                 uint amountOfDeadEnds = 0;
                 foreach (Directions direction in Direction.AllDirections) {
                     if (IsDeadEnd(tiles, tiles[i][j].Position, direction)) {
