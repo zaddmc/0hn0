@@ -316,14 +316,11 @@ internal class Program {
         for (int i = 0; i < gridSize; i++) {
             tilesRot[i] = new TileInfo[gridSize];
         }
-
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 tilesRot[j][i] = tiles[i][j];
             }
         }
-
-
         return tilesRot;
     }
     static bool IsDone(TileInfo[][] tiles) {
